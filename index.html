@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<header>
+<meta charset="utf-8">
+<title>Courseware Player</title>
+<!-- <script src="./courseware.js"></script> -->
+<script src="https://unpkg.com/vue"></script>
+<script src="./dist/cwplayer.umd.js"></script>
+
+<link rel="stylesheet" href="./dist/cwplayer.css">
+</header>
+<body>
+<div id="cwp">
+  <cwplayer></cwplayer>
+</div>
+
+<script>
+new Vue({
+  components: {
+    cwplayer
+  }
+}).$mount('#cwp')
+</script>
+<body>
+  </html>
