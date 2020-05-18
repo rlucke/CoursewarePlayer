@@ -26,7 +26,8 @@
 <script>
 import ChapterNav from './ChapterNav'
 import Section from './Section'
-import axios from 'axios'
+// import axios from 'axios'
+//import courseware from '../../cwData/courseware.json'
 
 export default {
     name: 'Courseware',
@@ -44,22 +45,27 @@ export default {
         }
     },
     beforeMount() {
-        let view = this;
-        axios
-        .get(this.coursewarePath + 'courseware.json')
-        .then(response => {
-            view.courseware = response.data;
-            view.courseware.coursewarePath = view.coursewarePath;
-            let firstChapter = view.courseware.children[0].id;
-            view.setChapter(firstChapter);
-        })
-        .catch(error => {
-            console.log(error);
-        });
+        //let view = this;
+        // axios
+        // .get(this.coursewarePath + 'courseware.json')
+        // .then(response => {
+        //     view.courseware = response.data;
+        //     view.courseware.coursewarePath = view.coursewarePath;
+        //     let firstChapter = view.courseware.children[0].id;
+        //     view.setChapter(firstChapter);
+        // })
+        // .catch(error => {
+        //     console.log(error);
+        // });
+        console.log(COURSEWARE);
+        this.courseware = COURSEWARE;
+        this.courseware.coursewarePath = this.coursewarePath;
+        let firstChapter = this.courseware.children[0].id;
+        this.setChapter(firstChapter);
+
     },
     methods: {
         navigate(nav){
-            console.log(nav);
             switch (nav.type) {
                 case 'Section':
                     this.setSection(nav.id);

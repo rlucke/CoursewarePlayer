@@ -74,6 +74,7 @@ export default {
             setInterval(function() {
                 let now = new Date().getTime();
                 let distance = view.timestamp - now;
+                if(distance < 0) {return;}
                 view.countdownDays = Math.floor(distance / (1000 * 60 * 60 * 24));
                 view.countdownHours = ("0" + Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).slice(-2);
                 view.countdownMinutes = ("0" + Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).slice(-2);

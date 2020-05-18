@@ -56,20 +56,34 @@ export default {
     },
     data(){
         return{
-            blocks: [],
+            // blocks: [],
             blockList: []
         }
     },
     watch: {
-        activeSection: function(section) {
-            this.blocks = [];
-            if(section.children == null) {return;}
-            section.children.forEach(block =>{
-                if(this.blockList.includes(block.type)) {
-                    this.blocks.push(block);
+        // activeSection: function(section) {
+        //     this.blocks = [];
+        //     if(section.children == null) {return;}
+        //     section.children.forEach(block =>{
+        //         if(this.blockList.includes(block.type)) {
+        //             this.blocks.push(block);
+        //         }
+        //     });
+        // },
+    },
+    computed: {
+        blocks() {
+            let view = this;
+            let blocks = [];
+            if(this.activeSection.children == null) {return blocks;}
+            this.activeSection.children.forEach(block =>{
+                if(view.blockList.includes(block.type)) {
+                    blocks.push(block);
                 }
             });
-        },
+
+            return blocks;
+        }
     },
     beforeMount(){
         for (let [key, value] of Object.entries(this.$options.components)) {
