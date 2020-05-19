@@ -4,7 +4,7 @@
         <div class="cw-folder">
             <ul>
                 <li v-for="file in block.data.files" :key="file.id" class="cw-folder-file-item">
-                    <a :href="coursewarePath + file.path" download>
+                    <a :href="coursewarePath + file.path" :download="file.name" target="_blank">
                         <span class="cw-folder-file-info" :class="['cw-folder-fileicon-'+file.icon]"> {{file.name}} </span>
                         <span name="download" class="cw-folder-download-icon" ></span>
                     </a> 

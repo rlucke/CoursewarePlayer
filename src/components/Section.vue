@@ -56,20 +56,8 @@ export default {
     },
     data(){
         return{
-            // blocks: [],
             blockList: []
         }
-    },
-    watch: {
-        // activeSection: function(section) {
-        //     this.blocks = [];
-        //     if(section.children == null) {return;}
-        //     section.children.forEach(block =>{
-        //         if(this.blockList.includes(block.type)) {
-        //             this.blocks.push(block);
-        //         }
-        //     });
-        // },
     },
     computed: {
         blocks() {

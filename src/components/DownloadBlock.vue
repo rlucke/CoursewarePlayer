@@ -4,7 +4,7 @@
         <div class="cw-download-file">
             <div class="cw-download-info" :class="{['cw-fileicon-'+block.data.icon]:true}" > &nbsp; {{block.data.file}} </div>
                 <div class="cw-download-button-wrapper">
-                    <a :href="coursewarePath + block.data.href" download> 
+                    <a :href="coursewarePath + block.data.href" :download="block.data.file" target="_blank"> 
                         <button name="download" class="cw-download-button">Herunterladen</button>
                     </a> 
                 </div>
