@@ -10,7 +10,7 @@
         <header class="section-header">{{ activeSection.title }}</header>
         <ul class="block-list">
             <li class="block-list-item" v-for="block in blocks" :key="block.id">
-                <component :is="block.type" :block="block" :coursewarePath="coursewarePath" @navigate="navigate"></component>
+                <component :is="block.type" :block="block" :SectionBlocks="blocks" :coursewarePath="coursewarePath" @navigate="navigate" @hideBlocks="hideBlocks"></component>
             </li>
         </ul>
     </div>
@@ -19,6 +19,7 @@
 <script>
 import SectionNav from './SectionNav';
 
+import AssortBlock from './AssortBlock';
 import AudioBlock from './AudioBlock';
 import BeforeAfterBlock from './BeforeAfterBlock';
 import CanvasBlock from './CanvasBlock';
@@ -32,6 +33,7 @@ import GalleryBlock from './GalleryBlock';
 import HtmlBlock from './HtmlBlock';
 import IFrameBlock from './IFrameBlock';
 import ImageMapBlock from './ImageMapBlock';
+import InteractiveVideoBlock from './InteractiveVideoBlock';
 import KeyPointBlock from './KeyPointBlock';
 import LinkBlock from './LinkBlock';
 import PdfBlock from './PdfBlock';
@@ -42,12 +44,12 @@ import VideoBlock from './VideoBlock';
 export default {
     name: 'Section',
     components: {
-        SectionNav,
+        SectionNav, AssortBlock,
         AudioBlock, BeforeAfterBlock, CanvasBlock, ChartBlock,
         CodeBlock, DateBlock, DownloadBlock, EmbedBlock,
         FolderBlock, GalleryBlock, HtmlBlock, IFrameBlock,
-        ImageMapBlock, KeyPointBlock, LinkBlock, PdfBlock,
-        TestBlock, TypewriterBlock, VideoBlock
+        ImageMapBlock, InteractiveVideoBlock,KeyPointBlock, LinkBlock,
+        PdfBlock, TestBlock, TypewriterBlock, VideoBlock
     },
     props: {
         subchapter: Object,
@@ -56,7 +58,8 @@ export default {
     },
     data(){
         return{
-            blockList: []
+            blockList: [],
+            hideBlockList: []
         }
     },
     computed: {
@@ -65,7 +68,7 @@ export default {
             let blocks = [];
             if(this.activeSection.children == null) {return blocks;}
             this.activeSection.children.forEach(block =>{
-                if(view.blockList.includes(block.type)) {
+                if((view.blockList.includes(block.type)) && (!view.hideBlockList.includes(block.id))){
                     blocks.push(block);
                 }
             });
@@ -113,6 +116,12 @@ export default {
         },
         navigate(event) {
             this.$emit('navigate', event);
+        },
+        hideBlocks(blocks) {
+            let view = this;
+            blocks.forEach((id)=> {
+                view.hideBlockList.push(id);
+            });
         }
     }
 }

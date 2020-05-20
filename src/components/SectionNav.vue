@@ -23,18 +23,11 @@ export default {
     },
     data() {
         return{
-            //selectedSection: '' //section.id
+            selectedSection: '' //section.id
         }
     },
-    computed:{
-        selectedSection(){
-            return this.selected;
-        }
-    },
-    watch:{
-        // selected: function(val) {
-        //     this.selectedSection = val;
-        // }
+    beforeMount() {
+        this.selectedSection = this.selected;
     },
     methods:{
         selectSection(id) {
