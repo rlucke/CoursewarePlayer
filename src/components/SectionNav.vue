@@ -6,7 +6,7 @@
             v-for="section in sections"
             :key="section.id"
             :title="section.title"
-            :class="[section.id == selectedSection ? 'active' : '', 'icon-'+section.icon]"
+            :class="[section.id == selected ? 'active' : '', 'icon-'+section.icon]"
             @click="selectSection(section.id)"
         >
         </li>
@@ -21,17 +21,8 @@ export default {
         selected: String,
         sections: Array
     },
-    data() {
-        return{
-            selectedSection: '' //section.id
-        }
-    },
-    beforeMount() {
-        this.selectedSection = this.selected;
-    },
     methods:{
         selectSection(id) {
-            this.selectedSection = id;
             this.$emit('setSection', id);
         },
     }
