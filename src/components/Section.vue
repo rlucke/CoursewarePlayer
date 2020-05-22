@@ -26,6 +26,7 @@ import CanvasBlock from './CanvasBlock';
 import ChartBlock from './ChartBlock';
 import CodeBlock from './CodeBlock';
 import DateBlock from './DateBlock';
+import DialogCardsBlock from './DialogCardsBlock';
 import DownloadBlock from './DownloadBlock';
 import EmbedBlock from './EmbedBlock';
 import FolderBlock from './FolderBlock';
@@ -46,7 +47,7 @@ export default {
     components: {
         SectionNav, AssortBlock,
         AudioBlock, BeforeAfterBlock, CanvasBlock, ChartBlock,
-        CodeBlock, DateBlock, DownloadBlock, EmbedBlock,
+        CodeBlock, DateBlock, DialogCardsBlock, DownloadBlock, EmbedBlock,
         FolderBlock, GalleryBlock, HtmlBlock, IFrameBlock,
         ImageMapBlock, InteractiveVideoBlock,KeyPointBlock, LinkBlock,
         PdfBlock, TestBlock, TypewriterBlock, VideoBlock
