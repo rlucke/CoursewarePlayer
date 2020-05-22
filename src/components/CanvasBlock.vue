@@ -7,9 +7,6 @@
         <div class="cw-canvasblock-buttonset">
             <button class="cw-canvasblock-reset" title="Zurücksetzen" @click="reset"></button>
             <button class="cw-canvasblock-undo" title="Rückgängig" @click="undo"></button>
-            <a :href="downloadImage" download="cw-img.jpeg">
-                <button class="cw-canvasblock-download" title="Download"></button>
-            </a>
         </div>
         <div class="cw-canvasblock-buttonset">
             <button
@@ -122,7 +119,6 @@ export default {
             currentTool: '',
             clickTool: [],
             Text: [],
-            downloadImage: new Image(),
             textInput: false
         }
     },
@@ -227,7 +223,6 @@ export default {
                         context.fillText(view.Text[i], clickX[i], clickY[i]+fontsize);
                     }
                 }
-                view.downloadImage = view.context.canvas.toDataURL('image/jpeg', 1.0);
             }
             outlineImage.src = this.$refs.image.src;
             //TODO no image canvas
