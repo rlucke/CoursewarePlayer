@@ -47,9 +47,10 @@ export default {
             });
         },
         isScrolledIntoView() {
+            let view = this;
             this.scrolledIntoView = (
-                (this.$refs.typewriter.offsetTop + this.$refs.typewriter.offsetHeight <= window.scrollY + window.innerHeight) 
-                && (this.$refs.typewriter.offsetTop >= window.scrollY)
+                (view.$refs.typewriter.offsetTop + view.$refs.typewriter.offsetHeight <= window.scrollY + window.innerHeight) 
+                && (view.$refs.typewriter.offsetTop >= window.scrollY)
             );
         }
     }
