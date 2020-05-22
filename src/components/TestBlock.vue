@@ -20,6 +20,7 @@
 
 <script>
 export default {
+  // Block is not ready yet! Do not use it!
     name: 'TestBlock',
     props:{
         block: Object,

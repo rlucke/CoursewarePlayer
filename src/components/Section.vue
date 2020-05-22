@@ -38,7 +38,7 @@ import InteractiveVideoBlock from './InteractiveVideoBlock';
 import KeyPointBlock from './KeyPointBlock';
 import LinkBlock from './LinkBlock';
 import PdfBlock from './PdfBlock';
-import TestBlock from './TestBlock';
+// import TestBlock from './TestBlock';
 import TypewriterBlock from './TypewriterBlock';
 import VideoBlock from './VideoBlock';
 
@@ -50,7 +50,8 @@ export default {
         CodeBlock, DateBlock, DialogCardsBlock, DownloadBlock, EmbedBlock,
         FolderBlock, GalleryBlock, HtmlBlock, IFrameBlock,
         ImageMapBlock, InteractiveVideoBlock,KeyPointBlock, LinkBlock,
-        PdfBlock, TestBlock, TypewriterBlock, VideoBlock
+        PdfBlock, TypewriterBlock, VideoBlock,
+        // TestBlock, 
     },
     props: {
         subchapter: Object,
