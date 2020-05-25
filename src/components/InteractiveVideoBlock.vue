@@ -1,33 +1,52 @@
 <template>
   <div class="InteractiveVideoBlock">
     <div class="cw-iav-wrapper">
-      <video class="cw-iav-player" id="video" oncontextmenu="return false;">
+      <video class="cw-iav-player" id="video" oncontextmenu="return false;" ref="video">
           <source :src="videoSrc" type="video/mp4">
       </video>
-      <div class="cw-iav-overlay-wrapper">
-          <div class="cw-iav-overlay-content cw-iav-overlay-content-default" >
-              <h2 class="cw-iav-overlay-content-title"></h2>
-              <p class="cw-iav-overlay-content-text"></p>
+      <div class="cw-iav-overlay-wrapper" v-show="showOverlay">
+          <div class="cw-iav-overlay-content" :class="[activeOverlay.position, activeOverlay.type, activeOverlay.color]">
+              <h2 class="cw-iav-overlay-content-title">{{activeOverlay.title}}</h2>
+              <p class="cw-iav-overlay-content-text">{{activeOverlay.content}}</p>
           </div>
       </div>
-      <div class="cw-iav-stop-wrapper">
-          <div class="cw-iav-stop-content cw-iav-stop-content-default" >
-              <h2 class="cw-iav-stop-content-title"></h2>
-              <p class="cw-iav-stop-content-text"></p>
-              <button class="button cw-iav-stop-button-continue">weiter</button>
+      <div class="cw-iav-stop-wrapper" v-show="showStop">
+          <div class="cw-iav-stop-content" :class="[activeStop.position, activeStop.type, activeStop.color]" >
+              <h2 class="cw-iav-stop-content-title">{{activeStop.title}}</h2>
+              <p class="cw-iav-stop-content-text">{{activeStop.content}}</p>
+              <button class="button cw-iav-stop-button-continue" @click="solveStop">weiter</button>
           </div>
       </div>
     </div>
+    <div 
+        class="cw-iav-seekbar-wrap"
+        ref="seekbar"
+        @mousedown = 'grabSeekbar'
+        @touchstart = 'grabSeekbar'
+        @touchmove = 'moveSeekbar'
+        @touchend = 'releaseSeekbar'
+      >
+        <div class="cw-iav-seekbar-current" :style = '{ transform: "scaleX(" + getProgressRate + ")" }' ></div>
+        <div class="cw-iav-seekbar-back"></div>
+    </div>
     <div class="cw-iav-controls">
-      <div class="cw-iav-range" ></div>
-      <span class="cw-iav-time"></span>
-      <button class="cw-iav-playbutton" name="play"></button> 
-      <button class="cw-iav-stopbutton" name="stop"></button>  
+      <span class="cw-iav-time">{{getCurrentTime}}/{{getDuration}}</span>
+      <button class="cw-iav-playbutton" :class="{playing:isPlaying}" name="play" @click="playVideo"></button> 
+      <button class="cw-iav-stopbutton" name="stop" @click="stopVideo"></button>  
     </div>
   </div>
 </template>
 
 <script>
+const debounce = (callback, duration) => {
+  var timer;
+  return function(event) {
+    clearTimeout(timer);
+    timer = setTimeout(function(){
+      callback(event);
+    }, duration);
+  };
+}
 export default {
     name: 'InteractiveVideoBlock',
     props:{
@@ -37,20 +56,178 @@ export default {
     data() {
       return{
         overlays: [],
+        activeOverlay: Object,
+        showOverlay: false,
         stops: [],
-        videoSrc: ''
+        activeStop: Object,
+        showStop: false,
+        videoSrc: '',
+        media: null,
+        seekbar: null,
+        seekbarWidth: 0,
+        seekbarOffsetX: 0,
+        time: 0,
+        duration: 0,
+        isPlaying: false,
+        isGrabbingSeekbar: false,
       }
     },
     beforeMount() {
       this.overlays = this.block.data.iav_overlays;
       this.stops = this.block.data.iav_stops;
+      this.stops.forEach(stop => {
+          stop.done = false;
+      });
       if(this.block.data.iav_source.external) {
         this.videoSrc = this.block.data.iav_source.url;
       } else {
           this.videoSrc = this.coursewarePath + './' + this.block.data.iav_source.file_id + '/' + this.block.data.iav_source.file_name;
       }
     },
+    mounted: function() {
+      // init
+      this.media = this.$refs.video;
+      this.seekbar = this.$refs.seekbar;
+      this.reLayoutSeekbar();
+
+      // addEventListener
+      window.addEventListener('resize', debounce(() => {
+        this.reLayoutSeekbar();
+      }), 100);
+      document.addEventListener('mousemove', (event) => {
+        this.moveSeekbar(event);
+      });
+      document.addEventListener('mouseup', (event) => {
+        this.releaseSeekbar(event);
+      });
+      this.media.addEventListener('loadedmetadata', () => {
+        this.duration = this.media.duration;
+      });
+      this.media.addEventListener('ended', () => {
+        this.media.currentTime = 0;
+        this.isPlaying = false;
+      });
+    },
+    computed: {
+      getProgressRate: function() {
+        return this.time / this.duration;
+      },
+      getCurrentTime: function() {
+        return this.convertSecondsToTime(this.time);
+      },
+      getDuration: function() {
+        return this.convertSecondsToTime(this.duration);
+      },
+    },
+    watch: {
+        time: function(val) {
+            let view = this;
+            let setOverlay = false;
+
+            this.overlays.forEach(overlay => {
+                if((overlay.start < val) && (overlay.end > val)) {
+                    this.activeOverlay = overlay;
+                    setOverlay = true;
+                }
+            });
+            if (setOverlay && !this.showOverlay) {
+                this.showOverlay = true;
+            } 
+            if (!setOverlay){
+                this.showOverlay = false;
+            }
+
+            let setStop = false;
+
+            this.stops.every(stop => {
+                if(stop.moment <= Math.round(val) && (!stop.done)) {
+                    this.activeStop = stop;
+                    setStop = true;
+                    return false;
+                } else {
+                    return true;
+                }
+            });
+            if (setStop) {
+                this.showStop = true;
+                this.media.pause();
+                this.media.currentTime = this.activeStop.moment;
+                this.time = this.activeStop.moment;
+                this.reLayoutSeekbar();
+            }
+            if (!setStop){
+                this.showStop = false;
+            }
+        }
+    },
     methods: {
+        playVideo() {
+            if (this.media.paused) {
+                this.media.play();
+                this.isPlaying = true;
+                this.loop();
+            } else {
+                this.media.pause();
+                this.isPlaying = false;
+            }
+        },
+        stopVideo() {
+            this.media.pause();
+            this.media.currentTime = 0;
+            this.time = 0;
+            this.isPlaying = false;
+            this.stops.forEach(stop => {
+                stop.done = false;
+            });
+        },
+        loop: function() {
+            this.time = this.media.currentTime;
+            if (!this.isPlaying) return;
+            requestAnimationFrame(() => {
+            this.loop();
+            });
+        },
+        solveStop() {
+            let view = this;
+            this.stops.every(stop => {
+                if (stop.id == view.activeStop.id) {
+                    stop.done = true;
+                    return false;
+                } else {
+                    return true;
+                }
+            });
+            this.showStop = false;
+            this.media.play();
+        },
+        grabSeekbar: function(event) {
+            event.preventDefault();
+            this.isGrabbingSeekbar = true;
+            this.time = this.media.currentTime = event.layerX / this.seekbarWidth * this.duration;
+            this.media.pause();
+        },
+        moveSeekbar: function(event) {
+            event.preventDefault();
+            if (!this.isGrabbingSeekbar) return;
+            this.time = this.media.currentTime = (event.clientX - this.seekbarOffsetX - window.pageXOffset) / this.seekbarWidth * this.duration;
+        },
+        releaseSeekbar: function(event) {
+            event.preventDefault();
+            this.isGrabbingSeekbar = false;
+            if (this.isPlaying) {
+            this.media.play();
+            }
+        },
+        reLayoutSeekbar: function() {
+            this.seekbarWidth = this.seekbar.clientWidth;
+            this.seekbarOffsetX = this.seekbar.getBoundingClientRect().left;
+        },
+        convertSecondsToTime: function(time) {
+            let seconds = Math.floor(time % 60);
+            if (seconds < 10) seconds = '0' + seconds;
+            let minutes = Math.floor(time / 60 % 60);
+            return `${minutes}:${seconds}`
+        },
         seconds2time(seconds) {
           var hours   = Math.floor(seconds / 3600),
               minutes = Math.floor((seconds - (hours * 3600)) / 60),
@@ -226,7 +403,7 @@ export default {
           }
 
           p {
-              font-size: 1.5em;
+              font-size: 1.25em;
           }
       }
 
@@ -388,6 +565,27 @@ export default {
             background-image: url("../assets/icons/white/pause.svg");
           }
       }
+  }
+  .cw-iav-seekbar-wrap {
+      cursor: pointer;
+      position: relative;
+      margin-bottom: 10px;
+      padding: 10px 0;
+
+    .cw-iav-seekbar-current, .cw-iav-seekbar-back {
+      height: 3px;
+      position: absolute;
+      top: 10px; right: 0; left: 0;
+    }
+    .cw-iav-seekbar-current {
+      z-index: 2;
+      background-color: #28497c;
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+    .cw-iav-seekbar-back {
+      background-color: #ddd;
+    }
   }
 }
 </style>
