@@ -1,5 +1,5 @@
 <template>
-    <div class="PdfBlock">
+    <div class="PdfBlock" v-if="PdfViewer">
         <div class="cw-pdf-header">
             <button 
                 class="cw-pdf-button-prev"
@@ -24,6 +24,17 @@
             @mousemove="browsePdf"
         />
     </div>
+    <div v-else class="PdfBlock">
+        <div class="cw-pdf-header">
+            <span class="cw-pdf-title">{{block.data.pdf_title}}</span> 
+        </div>
+        <div class="cw-pdf-downloadbox">
+            <a :href="coursewarePath + block.data.pdf_file" download>
+                <span class="cw-pdf-file-info cw-pdf-fileicon-pdf"> {{block.data.pdf_filename}} </span>
+                <span name="download" class="cw-pdf-download-icon" ></span>
+            </a>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -37,6 +48,7 @@ export default {
     },
     data() {
         return {
+            PdfViewer: true,
             pdfDoc: null,
             pageNum: 1,
             pageRendering: false,
@@ -56,16 +68,22 @@ export default {
             }
         }
     },
+    beforeMount() {
+        if (window.location.protocol == 'file:') {
+            this.PdfViewer = false;
+        }
+    },
     mounted() {
-        let view = this;
-        this.canvas = this.$refs.pdfcanvas;
-        this.context = this.canvas.getContext('2d');
-
-        pdfjsLib.getDocument(this.coursewarePath + this.block.data.pdf_file).promise.then(function(pdf) {
-            view.pdfDoc = pdf;
-            view.pageCount = view.pdfDoc.numPages;
-            view.renderPage(view.pageNum);
-        });
+        if (this.PdfViewer) {
+            let view = this;
+            this.canvas = this.$refs.pdfcanvas;
+            this.context = this.canvas.getContext('2d');
+            pdfjsLib.getDocument(this.coursewarePath + this.block.data.pdf_file).promise.then(function(pdf) {
+                view.pdfDoc = pdf;
+                view.pageCount = view.pdfDoc.numPages;
+                view.renderPage(view.pageNum);
+            });
+        }
     },
     methods: {
         renderPage(num) {
@@ -151,7 +169,7 @@ export default {
         text-align: center;
         border: solid thin #ccc;
         background-color: #fff;
-        margin: 0 -2px 0 0;
+        margin: 0;
         border-bottom: none;
 
         .cw-pdf-button-prev, 
@@ -196,7 +214,34 @@ export default {
     }
     .cw-pdf-canvas {
         border: solid thin #ccc;
-        width: 100%;
+        width: 890px;
+    }
+    .cw-pdf-downloadbox {
+        border: solid thin #ccc;
+        padding: 0.5em 1em;
+
+        .cw-pdf-file-info {
+            background-image: url("../assets/icons/blue/file.svg");
+            display: inline-block;
+            background-repeat: no-repeat;
+            background-size: 24px;
+            padding-left: 26px;
+            margin: 1em;
+            line-height: 24px; 
+            color: #28497c;
+            &.cw-pdf-fileicon-pdf {
+                background-image: url("../assets/icons/blue/file-pdf.svg");
+            }
+        }
+        .cw-pdf-download-icon {
+            float: right;
+            background-image: url("../assets/icons/blue/download.svg");
+            height: 24px;
+            width: 24px;
+            background-size: 24px;
+            background-repeat: no-repeat;
+            margin: 1em;
+        }
     }
 }
 </style>
