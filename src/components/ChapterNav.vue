@@ -87,10 +87,12 @@ export default {
     }
     .chapter-item.active-item {
         background-image: url("../assets/icons/blue/arr_1down.svg");
-        background-color: #eee;
+        background-color: #e4e4e4;
+        font-weight: 600;
     }
     .subchapter-item.active-item {
-        background-color: #f8f8f8;
+        background-color: #f0f0f0;
+        font-weight: 600;
     }
     .subchapter-item {
         margin: 0;
