@@ -126,13 +126,16 @@ export default {
             let id = '';
             if(this.activeSubchapter.id == this.activeChapter.children[len-1].id){
                 // go to next chapter if there is one
-                    this.courseware.children.forEach((chapter, index) => {
+                    this.courseware.children.every((chapter, index) => {
                         if(chapter.id == view.activeChapter.id) {
                             if (index < view.courseware.children.length-1) {
                                 view.activeChapter = view.courseware.children[index+1];
                                 view.activeSubchapter = view.activeChapter.children[0];
                                 view.activeSection = view.activeSubchapter.children[0];
                             }
+                            return false;
+                        } else {
+                            return true;
                         }
                     });
             } else {
