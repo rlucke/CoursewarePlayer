@@ -1,6 +1,6 @@
 <template>
     <div class="VideoBlock">
-        <h1 class="block-header">
+        <h1 class="block-header" v-if="block.data.videoTitle != ''">
             {{block.data.videoTitle}}
         </h1>
         <div v-if="webvideos.length > 0" class="video-wrapper" :class="[block.data.aspect]">
